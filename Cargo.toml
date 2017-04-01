@@ -1,0 +1,7 @@
+[package]
+name = "mobula"
+version = "0.1.0"
+authors = ["Isaac Azuelos <isaac@azuelos.ca>"]
+
+[dependencies]
+image = "0.12.3"
