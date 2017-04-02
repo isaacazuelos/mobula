@@ -7,10 +7,15 @@ use std::ops::Neg;
 use std::ops::Mul;
 use std::ops::Div;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct V3(f64, f64, f64);
 
 impl V3 {
+    /// Creates a new Vector in R3
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
+        V3(x, y, z)
+    }
+
     /// The `x` component of the vector.
     pub fn x(&self) -> f64 {
         self.0
@@ -25,37 +30,48 @@ impl V3 {
     }
 
     /// A zero vector.
-    fn zero() -> Self {
+    pub fn zero() -> Self {
         V3(0.0, 0.0, 0.0)
     }
 
     /// Multiply a vector by a scalar.
-    fn scale(self, factor: f64) -> Self {
+    pub fn scale(self, factor: f64) -> Self {
         V3(self.0 * factor, self.1 * factor, self.1 * factor)
     }
 
     /// The dot product of two vectors.
-    fn dot(self, other: V3) -> f64 {
+    pub fn dot(self, other: V3) -> f64 {
         (self.0 * other.0) + (self.1 * other.1) + (self.2 * other.2)
     }
 
     // The cross product of two vectors.
-    fn cross(self, other: V3) -> Self {
+    pub fn cross(self, other: V3) -> Self {
         let x = (self.1 * other.2) - (self.2 * other.1);
-        let y = (self.0 * other.2) - (self.2 * other.0);
+        let y = -((self.0 * other.2) - (self.2 * other.0));
         let z = (self.0 * other.1) - (self.1 * other.2);
         V3(x, y, z)
     }
 
     /// Make a normalized (unit) vector.
-    fn normalize(self) -> Self {
-        self.scale(1.0 / self.magnitude())
+    pub fn normalize(self) -> Self {
+        let mag = self.magnitude();
+        if mag == 0.0 {
+            V3::zero()
+        } else {
+            self.scale(1.0 / mag)
+        }
     }
 
     /// Find the magnitude of a vector.
-    fn magnitude(self) -> f64 {
+    pub fn magnitude(self) -> f64 {
         // This holds since u•u = ||u||^2
-        self.dot(self).abs().sqrt()
+        self.dot(self).sqrt()
+    }
+}
+
+impl Default for V3 {
+    fn default() -> Self {
+        Self::zero()
     }
 }
 
