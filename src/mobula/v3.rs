@@ -36,7 +36,7 @@ impl V3 {
 
     /// Multiply a vector by a scalar.
     pub fn scale(self, factor: f64) -> Self {
-        V3(self.0 * factor, self.1 * factor, self.1 * factor)
+        V3(self.0 * factor, self.1 * factor, self.2 * factor)
     }
 
     /// The dot product of two vectors.

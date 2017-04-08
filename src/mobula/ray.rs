@@ -3,7 +3,7 @@
 use mobula::v3::V3;
 use mobula::point::Point;
 
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Ray {
     origin: Point,
     direction: V3,
