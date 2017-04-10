@@ -3,6 +3,7 @@ name = "mobula"
 version = "0.1.0"
 dependencies = [
  "image 0.12.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rand 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

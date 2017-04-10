@@ -1,3 +1,4 @@
+pub mod camera;
 pub mod hit;
 pub mod point;
 pub mod ray;
