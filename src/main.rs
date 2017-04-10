@@ -42,8 +42,8 @@ fn main() {
     let origin = Point::origin();
 
     let mut world = World::new();
-    world.push(Box::new(Sphere::new(V3::new(0.0, -100.1, -1.0), 100.0)));
-    world.push(Box::new(Sphere::new(V3::new(0.0, 0.0, -1.0), 0.5)));
+    world.push(Box::new(Sphere::new(Point::new(0.0, -100.1, -1.0), 100.0)));
+    world.push(Box::new(Sphere::new(Point::new(0.0, 0.0, -1.0), 0.5)));
 
     let img = ImageBuffer::from_fn(IMAGE_WIDTH, IMAGE_HEIGHT, |i, j| {
 
