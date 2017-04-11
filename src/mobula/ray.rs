@@ -29,9 +29,3 @@ impl Ray {
         self.origin.translate(self.direction.scale(t))
     }
 }
-
-impl Default for Ray {
-    fn default() -> Ray {
-        Ray::new(Point::default(), V3::default())
-    }
-}

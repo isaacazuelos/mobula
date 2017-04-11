@@ -1,23 +1,16 @@
 use mobula::ray::Ray;
 use mobula::point::Point;
-use mobula::v3::V3;
 use mobula::hit::{Hit, Hitable};
 
 #[derive(Copy, Clone, Debug)]
 pub struct Sphere {
-    centre: Point,
-    radius: f64,
+    pub centre: Point,
+    pub radius: f64,
 }
 
 impl Sphere {
     pub fn new(centre: Point, radius: f64) -> Self {
         Sphere { centre, radius }
-    }
-    pub fn radius(&self) -> f64 {
-        self.radius
-    }
-    pub fn centre(&self) -> Point {
-        self.centre
     }
 }
 
