@@ -29,3 +29,12 @@ impl Ray {
         self.origin.translate(self.direction.scale(t))
     }
 }
+
+impl Default for Ray {
+    fn default() -> Self {
+        Ray {
+            origin: Point::origin(),
+            direction: V3::zero(),
+        }
+    }
+}

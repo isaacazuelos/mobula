@@ -40,6 +40,11 @@ impl V3 {
     //     V3 { x, y, z }
     // }
 
+    /// reflect a vector using the normal of the surface it's reflecting off of.
+    pub fn reflect(self, normal: V3) -> V3 {
+        self - normal.scale(2.0 * self.dot(normal))
+    }
+
     /// Make a normalized (unit) vector.
     pub fn normalize(self) -> Self {
         let mag = self.magnitude();

@@ -1,16 +1,22 @@
 use mobula::ray::Ray;
 use mobula::point::Point;
+use mobula::material::Material;
 use mobula::hit::{Hit, Hitable};
 
 #[derive(Copy, Clone, Debug)]
 pub struct Sphere {
     pub centre: Point,
     pub radius: f64,
+    pub material: Material,
 }
 
 impl Sphere {
-    pub fn new(centre: Point, radius: f64) -> Self {
-        Sphere { centre, radius }
+    pub fn new(centre: Point, radius: f64, material: Material) -> Self {
+        Sphere {
+            centre,
+            radius,
+            material,
+        }
     }
 }
 
@@ -28,6 +34,7 @@ impl Hitable for Sphere {
         }
 
         let mut hit = Hit::new();
+        hit.material = self.material;
 
         // first we'll try the - branch of the +- in the quadratic equation.
         let temp = (-b - (b * b - a * c).sqrt()) / a;
