@@ -13,6 +13,7 @@ pub trait Scatter {
 pub enum Material {
     Lambertian(Lambertian),
     Metal(Metal),
+    Dialectric(Dialectric),
 }
 
 impl Material {
@@ -25,6 +26,9 @@ impl Material {
                             albedo: V3::new(r, g, b),
                         })
     }
+    pub fn dialectric(refractive_index: f64) -> Self {
+        Material::Dialectric(Dialectric { refractive_index })
+    }
 }
 
 impl Scatter for Material {
@@ -32,6 +36,7 @@ impl Scatter for Material {
         match self {
             Material::Lambertian(m) => m.scatter(ray, hit, attenuation, scattered),
             Material::Metal(m) => m.scatter(ray, hit, attenuation, scattered),
+            Material::Dialectric(m) => m.scatter(ray, hit, attenuation, scattered),
         }
     }
 }
@@ -84,5 +89,57 @@ impl Scatter for Metal {
                               reflected + random_in_unit_sphere().scale(self.fuzz));
         *attenuation = self.albedo;
         scattered.direction().dot(hit.normal) > 0.0
+    }
+}
+#[derive(Copy, Clone, Debug)]
+pub struct Dialectric {
+    refractive_index: f64,
+}
+
+impl Dialectric {
+    fn schlick(&self, cosine: f64) -> f64 {
+        let mut r0 = (1.0 - self.refractive_index) / (1.0 + self.refractive_index);
+        r0 = r0 * r0;
+        r0 + (1.0 - r0) * (1.0 - cosine).powf(5.0)
+    }
+}
+
+impl Scatter for Dialectric {
+    fn scatter(self, ray: &Ray, hit: &Hit, attenuation: &mut V3, scattered: &mut Ray) -> bool {
+        let outward_normal: V3;
+        let reflected = ray.direction().reflect(hit.normal);
+        let ni_over_nt: f64;
+        *attenuation = V3::new(1.0, 1.0, 1.0);
+        let reflect_probability: f64;
+        let cosine: f64;
+
+        if ray.direction().dot(hit.normal) > 0.0 {
+            outward_normal = -hit.normal;
+            ni_over_nt = self.refractive_index;
+            cosine = self.refractive_index * ray.direction().dot(hit.normal) /
+                     ray.direction().magnitude().powf(2.0);
+        } else {
+            outward_normal = hit.normal;
+            ni_over_nt = 1.0 / self.refractive_index;
+            cosine = -ray.direction().dot(hit.normal) / ray.direction().magnitude().powf(2.0);
+        }
+
+        let mut refracted = V3::default();
+        match ray.direction().refract(outward_normal, ni_over_nt) {
+            None => reflect_probability = 1.0,
+            Some(r) => {
+                reflect_probability = self.schlick(cosine);
+                refracted = r;
+            }
+        }
+
+        let rand = rand::random::<f64>();
+
+        if rand < reflect_probability {
+            *scattered = Ray::new(hit.intersection, reflected);
+        } else {
+            *scattered = Ray::new(hit.intersection, refracted);
+        }
+        true
     }
 }

@@ -32,17 +32,23 @@ impl V3 {
         (self.x * other.x) + (self.y * other.y) + (self.z * other.z)
     }
 
-    // The cross product of two vectors.
-    // pub fn cross(self, other: V3) -> Self {
-    //     let x = (self.y * other.z) - (self.z * other.y);
-    //     let y = -((self.x * other.z) - (self.z * other.x));
-    //     let z = (self.x * other.y) - (self.y * other.z);
-    //     V3 { x, y, z }
-    // }
-
     /// reflect a vector using the normal of the surface it's reflecting off of.
     pub fn reflect(self, normal: V3) -> V3 {
         self - normal.scale(2.0 * self.dot(normal))
+    }
+
+    /// refract a vector
+    pub fn refract(self, normal: V3, ni_over_nt: f64) -> Option<V3> {
+        let uv = self.normalize();
+        let dt = uv.dot(normal);
+        let discriminant = 1.0 - (ni_over_nt * ni_over_nt * (1.0 - dt * dt));
+        if discriminant > 0.0 {
+            let refracted = (uv - normal.scale(dt)).scale(ni_over_nt) -
+                            normal.scale(discriminant.sqrt());
+            Some(refracted)
+        } else {
+            None
+        }
     }
 
     /// Make a normalized (unit) vector.

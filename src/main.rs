@@ -18,8 +18,8 @@ use mobula::world::{World, nearest_hit};
 
 const IMAGE_WIDTH: u32 = 800;
 const IMAGE_HEIGHT: u32 = 400;
-const SAMPLES: u32 = 8;
-const MAX_DEPTH: u32 = 20;
+const SAMPLES: u32 = 32;
+const MAX_DEPTH: u32 = 50;
 
 fn linear_interpolation(start: V3, end: V3, t: f64) -> V3 {
     start.scale(1.0 - t) + end.scale(t)
@@ -57,22 +57,23 @@ fn colour(ray: Ray, world: &World, depth: u32) -> V3 {
 fn main() {
     let camera = Camera::new();
     let mut world = World::new();
+    // smaller matte blue sphere in the center of the frame
+    world.push(Box::new(Sphere::new(Point::new(0.0, 0.0, -1.0),
+                                    0.5,
+                                    Material::lambertian(0.1, 0.2, 0.5))));
     // huge matte green sphere as the 'ground'
     world.push(Box::new(Sphere::new(Point::new(0.0, -100.5, -1.0),
                                     100.0,
                                     Material::lambertian(0.8, 0.8, 0.0))));
-    // smaller matte red sphere in the center of the frame
-    world.push(Box::new(Sphere::new(Point::new(0.0, 0.0, -1.0),
-                                    0.5,
-                                    Material::lambertian(0.8, 0.3, 0.3))));
     // metal sphere on the right
     world.push(Box::new(Sphere::new(Point::new(1.0, 0.0, -1.0),
                                     0.5,
-                                    Material::metal(0.8, 0.6, 0.2, 1.0))));
-    // metal sphere on the left
+                                    Material::metal(0.8, 0.6, 0.2, 0.5))));
+    // glass sphere on the left
+    world.push(Box::new(Sphere::new(Point::new(-1.0, 0.0, -1.0), 0.5, Material::dialectric(1.5))));
     world.push(Box::new(Sphere::new(Point::new(-1.0, 0.0, -1.0),
-                                    0.5,
-                                    Material::metal(0.8, 0.8, 0.8, 0.3))));
+                                    -0.45,
+                                    Material::dialectric(1.5))));
 
     let img = ImageBuffer::from_fn(IMAGE_WIDTH, IMAGE_HEIGHT, |i, j| {
         let u = (i as f64) / (IMAGE_WIDTH as f64);
