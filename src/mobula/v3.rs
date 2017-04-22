@@ -14,7 +14,7 @@ pub struct V3 {
 impl V3 {
     /// Creates a new Vector in R3
     pub fn new(x: f64, y: f64, z: f64) -> Self {
-        V3 { x, y, z }
+        V3 { x: x, y: y, z: z }
     }
 
     /// A zero vector.

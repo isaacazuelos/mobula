@@ -20,7 +20,7 @@ impl Point {
 
     /// Construct a new point.
     pub fn new(x: f64, y: f64, z: f64) -> Point {
-        Point { x, y, z }
+        Point { x: x, y: y, z: z }
     }
 
     // Turn a point into a vector, which is used a lot for math.

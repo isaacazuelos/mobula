@@ -13,9 +13,9 @@ pub struct Sphere {
 impl Sphere {
     pub fn new(centre: Point, radius: f64, material: Material) -> Self {
         Sphere {
-            centre,
-            radius,
-            material,
+            centre: centre,
+            radius: radius,
+            material: material,
         }
     }
 }

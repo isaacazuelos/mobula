@@ -22,12 +22,12 @@ impl Material {
     }
     pub fn metal(r: f64, g: f64, b: f64, fuzz: f64) -> Self {
         Material::Metal(Metal {
-                            fuzz,
+                            fuzz: fuzz,
                             albedo: V3::new(r, g, b),
                         })
     }
     pub fn dialectric(refractive_index: f64) -> Self {
-        Material::Dialectric(Dialectric { refractive_index })
+        Material::Dialectric(Dialectric { refractive_index: refractive_index })
     }
 }
 
