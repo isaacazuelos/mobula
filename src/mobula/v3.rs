@@ -32,6 +32,14 @@ impl V3 {
         (self.x * other.x) + (self.y * other.y) + (self.z * other.z)
     }
 
+    // Cross product of two vectors.
+    pub fn cross(self, v2: V3) -> V3 {
+        let v1 = self;
+        V3::new(v1.y * v2.z - v1.z * v2.y,
+                -(v1.x * v2.z - v1.z * v2.x),
+                v1.x * v2.y - v1.y * v2.x)
+    }
+
     /// reflect a vector using the normal of the surface it's reflecting off of.
     pub fn reflect(self, normal: V3) -> V3 {
         self - normal.scale(2.0 * self.dot(normal))

@@ -18,6 +18,11 @@ impl Point {
         Point::new(self.x + v.x, self.y + v.y, self.z + v.z)
     }
 
+    // Make a point out of a vector.
+    pub fn from_v3(v: V3) -> Self {
+        Point::new(v.x, v.y, v.z)
+    }
+
     /// Construct a new point.
     pub fn new(x: f64, y: f64, z: f64) -> Point {
         Point { x: x, y: y, z: z }

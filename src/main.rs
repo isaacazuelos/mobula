@@ -5,6 +5,7 @@ mod mobula;
 
 use std::path::Path;
 use std::default::Default;
+use std::io::{self, Write};
 
 use image::ImageBuffer;
 
@@ -18,7 +19,7 @@ use mobula::world::{World, nearest_hit};
 
 const IMAGE_WIDTH: u32 = 800;
 const IMAGE_HEIGHT: u32 = 400;
-const SAMPLES: u32 = 32;
+const SAMPLES: u32 = 16;
 const MAX_DEPTH: u32 = 50;
 
 fn linear_interpolation(start: V3, end: V3, t: f64) -> V3 {
@@ -54,6 +55,22 @@ fn colour(ray: Ray, world: &World, depth: u32) -> V3 {
     }
 }
 
+fn print_progress(x: u32, y: u32) {
+    let current = (IMAGE_WIDTH * y) + x;
+    let max = IMAGE_WIDTH * IMAGE_HEIGHT;
+    if current == 0 {
+        print!("rendering [")
+    } else if current % (max / 50) == 0 {
+        print!("#");
+        // failing to flush doesn't matter.
+        let _ = io::stdout().flush();
+    }
+    if current == max - 1 {
+        println!("] complete!");
+    }
+
+}
+
 fn main() {
     let camera = Camera::new();
     let mut world = World::new();
@@ -76,6 +93,9 @@ fn main() {
                                     Material::dialectric(1.5))));
 
     let img = ImageBuffer::from_fn(IMAGE_WIDTH, IMAGE_HEIGHT, |i, j| {
+
+        print_progress(i, j);
+
         let u = (i as f64) / (IMAGE_WIDTH as f64);
         let v = ((IMAGE_HEIGHT - j) as f64) / (IMAGE_HEIGHT as f64);
 
