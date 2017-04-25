@@ -7,7 +7,7 @@ use std::path::Path;
 use std::default::Default;
 use std::io::{self, Write};
 
-use image::ImageBuffer;
+use image::ImageBuffer
 
 use mobula::camera::Camera;
 use mobula::material::{Material, Scatter};
@@ -19,8 +19,8 @@ use mobula::world::{World, nearest_hit};
 
 const IMAGE_WIDTH: u32 = 800;
 const IMAGE_HEIGHT: u32 = 400;
-const SAMPLES: u32 = 32;
-const MAX_DEPTH: u32 = 50;
+const SAMPLES: u32 = 512;
+const MAX_DEPTH: u32 = 512;
 
 fn linear_interpolation(start: V3, end: V3, t: f64) -> V3 {
     start.scale(1.0 - t) + end.scale(t)
@@ -60,6 +60,7 @@ fn print_progress(x: u32, y: u32) {
     let max = IMAGE_WIDTH * IMAGE_HEIGHT;
     if current == 0 {
         print!("rendering [")
+        let _ = io::stdout().flush();
     } else if current % (max / 50) == 0 {
         print!("#");
         // failing to flush doesn't matter.
@@ -68,7 +69,6 @@ fn print_progress(x: u32, y: u32) {
     if current == max - 1 {
         println!("] complete!");
     }
-
 }
 
 fn main() {
