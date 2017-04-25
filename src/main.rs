@@ -19,7 +19,7 @@ use mobula::world::{World, nearest_hit};
 
 const IMAGE_WIDTH: u32 = 800;
 const IMAGE_HEIGHT: u32 = 400;
-const SAMPLES: u32 = 16;
+const SAMPLES: u32 = 32;
 const MAX_DEPTH: u32 = 50;
 
 fn linear_interpolation(start: V3, end: V3, t: f64) -> V3 {
@@ -72,7 +72,19 @@ fn print_progress(x: u32, y: u32) {
 }
 
 fn main() {
-    let camera = Camera::new();
+
+    let lookfrom = Point::new(3.0, 3.0, 2.0);
+    let lookat = Point::new(0.0, 0.0, -1.0);
+    let focus_distance = (lookfrom.v3() - lookat.v3()).magnitude();
+    let aperture = 2.0;
+
+    let camera = Camera::new(lookfrom,
+                             lookat,
+                             V3::new(0.0, 1.0, 0.0),
+                             20.0,
+                             IMAGE_WIDTH as f64 / IMAGE_HEIGHT as f64,
+                             aperture,
+                             focus_distance);
     let mut world = World::new();
     // smaller matte blue sphere in the center of the frame
     world.push(Box::new(Sphere::new(Point::new(0.0, 0.0, -1.0),

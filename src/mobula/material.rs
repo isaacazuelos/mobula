@@ -133,7 +133,7 @@ impl Scatter for Dialectric {
             }
         }
 
-        let rand = rand::random::<f64>();
+        let rand: f64 = rand::random();
 
         if rand < reflect_probability {
             *scattered = Ray::new(hit.intersection, reflected);
