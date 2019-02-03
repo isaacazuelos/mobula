@@ -1,3 +1,5 @@
+use std::ops::{Add, Sub};
+
 use crate::mobula::v3::V3;
 
 #[derive(Copy, Clone, Debug)]
@@ -24,9 +26,29 @@ impl Point {
     }
 }
 
-
 impl From<V3> for Point {
     fn from(v: V3) -> Self {
         unsafe { ::std::mem::transmute(v) }
+    }
+}
+
+impl Add<V3> for Point {
+    type Output = V3;
+    fn add(self, other: V3) -> V3 {
+        V3::from(self) + other
+    }
+}
+
+impl Sub<V3> for Point {
+    type Output = V3;
+    fn sub(self, other: V3) -> V3 {
+        V3::from(self) - other
+    }
+}
+
+impl Sub<Point> for Point {
+    type Output = V3;
+    fn sub(self, other: Point) -> V3 {
+        V3::from(self) - V3::from(other)
     }
 }
