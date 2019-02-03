@@ -1,12 +1,19 @@
 [package]
-name = "mobula"
+name = "mobula_ui"
 version = "0.1.0"
 authors = ["Isaac Azuelos <isaac@azuelos.ca>"]
 edition = "2018"
 
+[[bin]]
+name = "mobula"
+path = "bin/main.rs"
+
+[workspace]
+
 [dependencies]
+mobula = { path = "src/mobula" }
 
 image = "0.21.0"
 rand = "0.6.5"
-serde = { features = ['derive'], version = "1.0.86" } 
+serde = { features = ["derive"], version = "1.0.86" } 
 serde_json = "1.0.38"

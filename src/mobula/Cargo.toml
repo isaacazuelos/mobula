@@ -1,0 +1,9 @@
+[package]
+name = "mobula"
+version = "0.1.0"
+authors = ["Isaac Azuelos <isaac@azuelos.ca>"]
+edition = "2018"
+
+[dependencies]
+rand = "0.6.5"
+serde = { features = ["derive"], version = "1.0.86" } 

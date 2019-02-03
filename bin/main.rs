@@ -8,24 +8,11 @@ use std::path::Path;
 
 use image::ImageBuffer;
 
-mod camera;
-mod config;
-mod hit;
-mod material;
-mod point;
-mod ray;
-mod scene;
-mod shape;
-mod v3;
-
-use crate::camera::{Camera, CameraBuilder};
-use crate::config::Config;
-use crate::material::{Material, Scatter};
-use crate::point::Point;
-use crate::ray::Ray;
-use crate::scene::Scene;
-use crate::shape::{sphere::Sphere, Shape};
-use crate::v3::V3;
+use mobula::config::Config;
+use mobula::material::Scatter;
+use mobula::ray::Ray;
+use mobula::scene::Scene;
+use mobula::v3::V3;
 
 fn linear_interpolation(start: V3, end: V3, t: f64) -> V3 {
     start.scale(1.0 - t) + end.scale(t)
