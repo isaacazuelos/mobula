@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
-use mobula::v3::V3;
-use mobula::point::Point;
+use crate::mobula::point::Point;
+use crate::mobula::v3::V3;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Ray {
@@ -12,8 +12,8 @@ pub struct Ray {
 impl Ray {
     pub fn new(origin: Point, direction: V3) -> Self {
         Ray {
-            origin: origin,
-            direction: direction,
+            origin,
+            direction,
         }
     }
 

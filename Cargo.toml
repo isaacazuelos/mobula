@@ -2,7 +2,8 @@
 name = "mobula"
 version = "0.1.0"
 authors = ["Isaac Azuelos <isaac@azuelos.ca>"]
+edition = "2018"
 
 [dependencies]
-image = "0.12.3"
-rand = "0.3"
+image = "0.21"
+rand = "0.6"

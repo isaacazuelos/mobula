@@ -1,8 +1,8 @@
 use std::ops::Add;
-use std::ops::Sub;
-use std::ops::Neg;
-use std::ops::Mul;
 use std::ops::Div;
+use std::ops::Mul;
+use std::ops::Neg;
+use std::ops::Sub;
 
 #[derive(Copy, Clone, Debug)]
 pub struct V3 {
@@ -14,7 +14,7 @@ pub struct V3 {
 impl V3 {
     /// Creates a new Vector in R3
     pub fn new(x: f64, y: f64, z: f64) -> Self {
-        V3 { x: x, y: y, z: z }
+        V3 { x, y, z }
     }
 
     /// A zero vector.
@@ -35,9 +35,11 @@ impl V3 {
     // Cross product of two vectors.
     pub fn cross(self, v2: V3) -> V3 {
         let v1 = self;
-        V3::new(v1.y * v2.z - v1.z * v2.y,
-                -(v1.x * v2.z - v1.z * v2.x),
-                v1.x * v2.y - v1.y * v2.x)
+        V3::new(
+            v1.y * v2.z - v1.z * v2.y,
+            -(v1.x * v2.z - v1.z * v2.x),
+            v1.x * v2.y - v1.y * v2.x,
+        )
     }
 
     /// reflect a vector using the normal of the surface it's reflecting off of.
@@ -45,14 +47,15 @@ impl V3 {
         self - normal.scale(2.0 * self.dot(normal))
     }
 
-    /// refract a vector
+    /// refract a vector against a surface (using it's normal) and it's
+    /// refractive index (ni/nt).
     pub fn refract(self, normal: V3, ni_over_nt: f64) -> Option<V3> {
         let uv = self.normalize();
         let dt = uv.dot(normal);
         let discriminant = 1.0 - (ni_over_nt * ni_over_nt * (1.0 - dt * dt));
         if discriminant > 0.0 {
-            let refracted = (uv - normal.scale(dt)).scale(ni_over_nt) -
-                            normal.scale(discriminant.sqrt());
+            let refracted =
+                (uv - normal.scale(dt)).scale(ni_over_nt) - normal.scale(discriminant.sqrt());
             Some(refracted)
         } else {
             None

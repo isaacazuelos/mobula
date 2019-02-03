@@ -1,19 +1,31 @@
-use mobula::hit::{Hitable, Hit};
-use mobula::ray::Ray;
+use crate::mobula::hit::{Hit, Hitable};
+use crate::mobula::ray::Ray;
 
-pub type World = Vec<Box<Hitable>>;
+pub struct World {
+    objects: Vec<Box<Hitable>>,
+}
 
-pub fn nearest_hit(world: &World, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
-    let mut hit = None;
-    let mut closest_so_far = t_max;
-    for obj in world {
-        match obj.is_hit_by(ray, t_min, closest_so_far) {
-            None => {}
-            Some(nearer_hit) => {
-                closest_so_far = nearer_hit.t;
-                hit = Some(nearer_hit);
+impl World {
+    pub fn new() -> Self {
+        World { objects: Vec::new() }
+    }
+
+    pub fn nearest_hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
+        let mut hit = None;
+        let mut closest_so_far = t_max;
+        for obj in &self.objects {
+            match obj.is_hit_by(ray, t_min, closest_so_far) {
+                None => {}
+                Some(nearer_hit) => {
+                    closest_so_far = nearer_hit.t;
+                    hit = Some(nearer_hit);
+                }
             }
         }
+        hit      
     }
-    hit
+
+    pub fn add(&mut self, object: Box<Hitable>) {
+        self.objects.push(object);
+    }
 }

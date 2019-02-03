@@ -1,4 +1,4 @@
-use mobula::v3::V3;
+use crate::mobula::v3::V3;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Point {
@@ -8,6 +8,11 @@ pub struct Point {
 }
 
 impl Point {
+    /// Construct a new point.
+    pub fn new(x: f64, y: f64, z: f64) -> Point {
+        Point { x, y, z }
+    }
+
     /// A zero vector.
     pub fn origin() -> Self {
         Point::new(0.0, 0.0, 0.0)
@@ -23,13 +28,8 @@ impl Point {
         Point::new(v.x, v.y, v.z)
     }
 
-    /// Construct a new point.
-    pub fn new(x: f64, y: f64, z: f64) -> Point {
-        Point { x: x, y: y, z: z }
-    }
-
     // Turn a point into a vector, which is used a lot for math.
-    pub fn v3(self) -> V3 {
+    pub fn to_v3(self) -> V3 {
         V3::new(self.x, self.y, self.z)
     }
 }

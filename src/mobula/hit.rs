@@ -1,7 +1,7 @@
-use mobula::point::Point;
-use mobula::ray::Ray;
-use mobula::material::Material;
-use mobula::v3::V3;
+use crate::mobula::material::Material;
+use crate::mobula::point::Point;
+use crate::mobula::ray::Ray;
+use crate::mobula::v3::V3;
 
 pub struct Hit {
     pub t: f64,
