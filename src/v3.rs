@@ -4,7 +4,7 @@ use std::ops::Mul;
 use std::ops::Neg;
 use std::ops::Sub;
 
-use crate::mobula::point::Point;
+use crate::point::Point;
 
 #[derive(Copy, Clone, Debug)]
 pub struct V3 {

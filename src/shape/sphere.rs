@@ -1,7 +1,7 @@
-use crate::mobula::hit::{Hit, Hitable};
-use crate::mobula::material::Material;
-use crate::mobula::point::Point;
-use crate::mobula::ray::Ray;
+use crate::hit::{Hit, Hitable};
+use crate::material::Material;
+use crate::point::Point;
+use crate::ray::Ray;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Sphere {

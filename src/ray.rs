@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
-use crate::mobula::point::Point;
-use crate::mobula::v3::V3;
+use crate::point::Point;
+use crate::v3::V3;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Ray {

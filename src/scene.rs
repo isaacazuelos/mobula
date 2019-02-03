@@ -1,13 +1,13 @@
-use crate::mobula::hit::{Hit, Hitable};
-use crate::mobula::ray::Ray;
+use crate::hit::{Hit, Hitable};
+use crate::ray::Ray;
 
-pub struct World {
+pub struct Scene {
     objects: Vec<Box<Hitable>>,
 }
 
-impl World {
+impl Scene {
     pub fn new() -> Self {
-        World { objects: Vec::new() }
+        Scene { objects: Vec::new() }
     }
 
     pub fn nearest_hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {

@@ -1,8 +1,8 @@
 use rand::random;
 
-use crate::mobula::point::Point;
-use crate::mobula::ray::Ray;
-use crate::mobula::v3::V3;
+use crate::point::Point;
+use crate::ray::Ray;
+use crate::v3::V3;
 
 use std::f64::consts::PI;
 

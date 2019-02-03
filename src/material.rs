@@ -1,14 +1,15 @@
 use rand;
 
-use crate::mobula::hit::Hit;
-use crate::mobula::ray::Ray;
-use crate::mobula::v3::V3;
+use crate::hit::Hit;
+use crate::ray::Ray;
+use crate::v3::V3;
 
 pub trait Scatter {
-    // this isn't a very rusty signature, but I want to get it working first.
+    // TODO: this isn't a very rusty signature, but I want to get it working first.
     fn scatter(self, ray: &Ray, hit: &Hit, attenuation: &mut V3, scattered: &mut Ray) -> bool;
 }
 
+// TODO: can this be a trait?
 #[derive(Copy, Clone, Debug)]
 pub enum Material {
     Lambertian(Lambertian),
@@ -29,9 +30,7 @@ impl Material {
         })
     }
     pub fn dialectric(refractive_index: f64) -> Self {
-        Material::Dialectric(Dialectric {
-            refractive_index,
-        })
+        Material::Dialectric(Dialectric { refractive_index })
     }
 }
 
@@ -46,6 +45,7 @@ impl Scatter for Material {
 }
 
 impl Default for Material {
+    // TODO: does this make sense?
     fn default() -> Self {
         Material::Lambertian(Lambertian::default())
     }
@@ -118,25 +118,28 @@ impl Scatter for Dialectric {
         *attenuation = V3::new(1.0, 1.0, 1.0);
 
         let (outward_normal, ni_over_nt, cosine) = if ray.direction().dot(hit.normal) > 0.0 {
-            let outward_normal = -hit.normal;
-            let ni_over_nt = self.refractive_index;
-            let cosine = self.refractive_index * ray.direction().dot(hit.normal)
-                / ray.direction().magnitude().powf(2.0);
-            (outward_normal, ni_over_nt, cosine)
+            (
+                -hit.normal,
+                self.refractive_index,
+                self.refractive_index * ray.direction().dot(hit.normal)
+                    / ray.direction().magnitude().powf(2.0),
+            )
         } else {
-            let outward_normal = hit.normal;
-            let ni_over_nt = 1.0 / self.refractive_index;
-            let cosine = -ray.direction().dot(hit.normal) / ray.direction().magnitude().powf(2.0);
-            (outward_normal, ni_over_nt, cosine)
+            (
+                hit.normal,
+                1.0 / self.refractive_index,
+                -ray.direction().dot(hit.normal) / ray.direction().magnitude().powf(2.0),
+            )
         };
 
-        let mut refracted = V3::default();
+        // TODO: is this sane? It's unused if it stays as this.
+        let mut refracted = V3::default(); 
         let reflect_probability = match ray.direction().refract(outward_normal, ni_over_nt) {
             None => 1.0,
             Some(r) => {
                 refracted = r;
                 self.schlick(cosine)
-            },
+            }
         };
 
         let rand: f64 = rand::random();

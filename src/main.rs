@@ -3,24 +3,27 @@
 // TODO: Document why? (2019-02-01)
 #![allow(clippy::cast_lossless)]
 
-extern crate image;
-extern crate rand;
-
-mod mobula;
-
-use std::default::Default;
 use std::io::{self, Write};
 use std::path::Path;
 
 use image::ImageBuffer;
 
-use mobula::camera::Camera;
-use mobula::material::{Material, Scatter};
-use mobula::point::Point;
-use mobula::ray::Ray;
-use mobula::shape::sphere::Sphere;
-use mobula::v3::V3;
-use mobula::world::World;
+mod camera;
+mod hit;
+mod material;
+mod point;
+mod ray;
+mod shape;
+mod v3;
+mod scene;
+
+use crate::camera::Camera;
+use crate::material::{Material, Scatter};
+use crate::point::Point;
+use crate::ray::Ray;
+use crate::shape::sphere::Sphere;
+use crate::v3::V3;
+use crate::scene::Scene;
 
 const IMAGE_WIDTH: u32 = 800;
 const IMAGE_HEIGHT: u32 = 600;
@@ -44,7 +47,7 @@ fn colour_background(ray: Ray) -> V3 {
     linear_interpolation(V3::new(1.0, 1.0, 1.0), V3::new(0.5, 0.7, 1.0), t)
 }
 
-fn colour(ray: Ray, world: &World, depth: u32) -> V3 {
+fn colour(ray: Ray, world: &Scene, depth: u32) -> V3 {
     match world.nearest_hit(&ray, 0.001, std::f64::MAX) {
         None => colour_background(ray),
         Some(hit) => {
@@ -94,32 +97,32 @@ fn main() {
         aperture,
         focus_distance,
     );
-    let mut world = World::new();
+    let mut scene = Scene::new();
     // smaller matte blue sphere in the center of the frame
-    world.add(Box::new(Sphere::new(
+    scene.add(Box::new(Sphere::new(
         Point::new(0.0, 0.0, -1.0),
         0.5,
         Material::lambertian(0.1, 0.2, 0.5),
     )));
     // huge matte green sphere as the 'ground'
-    world.add(Box::new(Sphere::new(
+    scene.add(Box::new(Sphere::new(
         Point::new(0.0, -100.5, -1.0),
         100.0,
         Material::lambertian(0.8, 0.8, 0.0),
     )));
     // metal sphere on the right
-    world.add(Box::new(Sphere::new(
+    scene.add(Box::new(Sphere::new(
         Point::new(1.0, 0.0, -1.0),
         0.5,
         Material::metal(0.8, 0.6, 0.2, 0.5),
     )));
     // glass sphere on the left
-    world.add(Box::new(Sphere::new(
+    scene.add(Box::new(Sphere::new(
         Point::new(-1.0, 0.0, -1.0),
         0.5,
         Material::dialectric(1.5),
     )));
-    world.add(Box::new(Sphere::new(
+    scene.add(Box::new(Sphere::new(
         Point::new(-1.0, 0.0, -1.0),
         -0.45,
         Material::dialectric(1.5),
@@ -136,7 +139,7 @@ fn main() {
             let h_sample = rand::random::<f64>() / (IMAGE_WIDTH as f64);
             let v_sample = rand::random::<f64>() / (IMAGE_HEIGHT as f64);
             let ray = camera.get_ray(u + h_sample, v + v_sample);
-            c = c + colour(ray, &world, 0);
+            c = c + colour(ray, &scene, 0);
         }
         c = c.scale(1.0 / (SAMPLES as f64));
         c = V3::new(c.x.sqrt(), c.y.sqrt(), c.z.sqrt());

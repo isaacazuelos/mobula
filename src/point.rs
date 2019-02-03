@@ -1,6 +1,6 @@
 use std::ops::{Add, Sub};
 
-use crate::mobula::v3::V3;
+use crate::v3::V3;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Point {
