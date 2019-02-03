@@ -1,3 +1,4 @@
+use serde::{Serialize, Deserialize};
 use rand;
 
 use crate::hit::Hit;
@@ -10,7 +11,8 @@ pub trait Scatter {
 }
 
 // TODO: can this be a trait?
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
+#[serde(tag="type")]
 pub enum Material {
     Lambertian(Lambertian),
     Metal(Metal),
@@ -51,7 +53,7 @@ impl Default for Material {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 pub struct Lambertian {
     albedo: V3,
 }
@@ -82,7 +84,7 @@ impl Default for Lambertian {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 pub struct Metal {
     albedo: V3,
     fuzz: f64,
@@ -99,7 +101,8 @@ impl Scatter for Metal {
         scattered.direction().dot(hit.normal) > 0.0
     }
 }
-#[derive(Copy, Clone, Debug)]
+
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 pub struct Dialectric {
     refractive_index: f64,
 }

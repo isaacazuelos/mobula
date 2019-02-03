@@ -32,9 +32,10 @@ $ git clone https://github.com/isaacazuelos/mobula
 and build it with [Cargo][]:
 
 ```sh
+$ git clone https://github.com/isaacazuelos/mobula
 $ cd mobula
-$ cargo install
-$ mobula
+$ cargo build --release
+$ ./target/release/mobula
 ```
 
 [cargo]: http://doc.crates.io

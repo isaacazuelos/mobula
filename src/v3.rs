@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use std::ops::Add;
 use std::ops::Div;
 use std::ops::Mul;
@@ -6,7 +8,7 @@ use std::ops::Sub;
 
 use crate::point::Point;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 pub struct V3 {
     pub x: f64,
     pub y: f64,

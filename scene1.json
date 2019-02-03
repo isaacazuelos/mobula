@@ -1,0 +1,109 @@
+{
+  "config": {
+    "width": 800,
+    "height": 600,
+    "samples": 256,
+    "depth": 256
+  },
+  "camera": {
+    "origin": {
+      "x": 3.0,
+      "y": 3.0,
+      "z": 2.0
+    },
+    "target": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": -1.0
+    },
+    "up": {
+      "x": 0.0,
+      "y": 1.0,
+      "z": 0.0
+    },
+    "fov": 20.0,
+    "aspect": null,
+    "aperture": 2.0,
+    "focus_distance": 5.196152422706632
+  },
+  "objects": [
+    {
+      "type": "Sphere",
+      "centre": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": -1.0
+      },
+      "radius": 0.5,
+      "material": {
+        "type": "Lambertian",
+        "albedo": {
+          "x": 0.1,
+          "y": 0.2,
+          "z": 0.5
+        }
+      }
+    },
+    {
+      "type": "Sphere",
+      "centre": {
+        "x": 0.0,
+        "y": -100.5,
+        "z": -1.0
+      },
+      "radius": 100.0,
+      "material": {
+        "type": "Lambertian",
+        "albedo": {
+          "x": 0.8,
+          "y": 0.8,
+          "z": 0.0
+        }
+      }
+    },
+    {
+      "type": "Sphere",
+      "centre": {
+        "x": 1.0,
+        "y": 0.0,
+        "z": -1.0
+      },
+      "radius": 0.5,
+      "material": {
+        "type": "Metal",
+        "albedo": {
+          "x": 0.8,
+          "y": 0.6,
+          "z": 0.2
+        },
+        "fuzz": 0.5
+      }
+    },
+    {
+      "type": "Sphere",
+      "centre": {
+        "x": -1.0,
+        "y": 0.0,
+        "z": -1.0
+      },
+      "radius": 0.5,
+      "material": {
+        "type": "Dialectric",
+        "refractive_index": 1.5
+      }
+    },
+    {
+      "type": "Sphere",
+      "centre": {
+        "x": -1.0,
+        "y": 0.0,
+        "z": -1.0
+      },
+      "radius": -0.45,
+      "material": {
+        "type": "Dialectric",
+        "refractive_index": 1.5
+      }
+    }
+  ]
+}

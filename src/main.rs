@@ -9,26 +9,23 @@ use std::path::Path;
 use image::ImageBuffer;
 
 mod camera;
+mod config;
 mod hit;
 mod material;
 mod point;
 mod ray;
+mod scene;
 mod shape;
 mod v3;
-mod scene;
 
-use crate::camera::Camera;
+use crate::camera::{Camera, CameraBuilder};
+use crate::config::Config;
 use crate::material::{Material, Scatter};
 use crate::point::Point;
 use crate::ray::Ray;
-use crate::shape::sphere::Sphere;
-use crate::v3::V3;
 use crate::scene::Scene;
-
-const IMAGE_WIDTH: u32 = 800;
-const IMAGE_HEIGHT: u32 = 600;
-const SAMPLES: u32 = 256;
-const MAX_DEPTH: u32 = 256;
+use crate::shape::{sphere::Sphere, Shape};
+use crate::v3::V3;
 
 fn linear_interpolation(start: V3, end: V3, t: f64) -> V3 {
     start.scale(1.0 - t) + end.scale(t)
@@ -47,18 +44,18 @@ fn colour_background(ray: Ray) -> V3 {
     linear_interpolation(V3::new(1.0, 1.0, 1.0), V3::new(0.5, 0.7, 1.0), t)
 }
 
-fn colour(ray: Ray, world: &Scene, depth: u32) -> V3 {
+fn colour(config: &Config, ray: Ray, world: &Scene, depth: u32) -> V3 {
     match world.nearest_hit(&ray, 0.001, std::f64::MAX) {
         None => colour_background(ray),
         Some(hit) => {
             let mut scattered = Ray::default();
             let mut attenuation = V3::default();
-            if depth < MAX_DEPTH
+            if depth < config.depth
                 && hit
                     .material
                     .scatter(&ray, &hit, &mut attenuation, &mut scattered)
             {
-                attenuation * colour(scattered, world, depth + 1)
+                attenuation * colour(config, scattered, world, depth + 1)
             } else {
                 V3::zero()
             }
@@ -66,9 +63,9 @@ fn colour(ray: Ray, world: &Scene, depth: u32) -> V3 {
     }
 }
 
-fn print_progress(x: u32, y: u32) {
-    let current = (IMAGE_WIDTH * y) + x;
-    let max = IMAGE_WIDTH * IMAGE_HEIGHT;
+fn print_progress(config: &Config, x: u32, y: u32) {
+    let current = (config.width * y) + x;
+    let max = config.width * config.height;
     if current == 0 {
         print!("rendering [");
         let _ = io::stdout().flush();
@@ -82,70 +79,33 @@ fn print_progress(x: u32, y: u32) {
     }
 }
 
-fn main() {
-    let look_from = Point::new(3.0, 3.0, 2.0);
-    let look_at = Point::new(0.0, 0.0, -1.0);
-    let focus_distance = (look_from - look_at).magnitude();
-    let aperture = 2.0;
+fn main() -> Result<(), Box<::std::error::Error>> {
+    use std::fs::File;
+    
+    let file = File::open("scene1.json")?;
+    let scene: Scene = serde_json::from_reader(file)?;
 
-    let camera = Camera::new(
-        look_from,
-        look_at,
-        V3::new(0.0, 1.0, 0.0),
-        20.0,
-        IMAGE_WIDTH as f64 / IMAGE_HEIGHT as f64,
-        aperture,
-        focus_distance,
-    );
-    let mut scene = Scene::new();
-    // smaller matte blue sphere in the center of the frame
-    scene.add(Box::new(Sphere::new(
-        Point::new(0.0, 0.0, -1.0),
-        0.5,
-        Material::lambertian(0.1, 0.2, 0.5),
-    )));
-    // huge matte green sphere as the 'ground'
-    scene.add(Box::new(Sphere::new(
-        Point::new(0.0, -100.5, -1.0),
-        100.0,
-        Material::lambertian(0.8, 0.8, 0.0),
-    )));
-    // metal sphere on the right
-    scene.add(Box::new(Sphere::new(
-        Point::new(1.0, 0.0, -1.0),
-        0.5,
-        Material::metal(0.8, 0.6, 0.2, 0.5),
-    )));
-    // glass sphere on the left
-    scene.add(Box::new(Sphere::new(
-        Point::new(-1.0, 0.0, -1.0),
-        0.5,
-        Material::dialectric(1.5),
-    )));
-    scene.add(Box::new(Sphere::new(
-        Point::new(-1.0, 0.0, -1.0),
-        -0.45,
-        Material::dialectric(1.5),
-    )));
+    let camera = scene.camera.build(&scene.config);
 
-    let img = ImageBuffer::from_fn(IMAGE_WIDTH, IMAGE_HEIGHT, |i, j| {
-        print_progress(i, j);
+    let img = ImageBuffer::from_fn(scene.config.width, scene.config.height, |i, j| {
+        print_progress(&scene.config, i, j);
 
-        let u = (i as f64) / (IMAGE_WIDTH as f64);
-        let v = ((IMAGE_HEIGHT - j) as f64) / (IMAGE_HEIGHT as f64);
+        let u = (i as f64) / (scene.config.width as f64);
+        let v = ((scene.config.height - j) as f64) / (scene.config.height as f64);
 
         let mut c = V3::zero();
-        for _ in 0..SAMPLES {
-            let h_sample = rand::random::<f64>() / (IMAGE_WIDTH as f64);
-            let v_sample = rand::random::<f64>() / (IMAGE_HEIGHT as f64);
+        for _ in 0..scene.config.samples {
+            let h_sample = rand::random::<f64>() / (scene.config.width as f64);
+            let v_sample = rand::random::<f64>() / (scene.config.height as f64);
             let ray = camera.get_ray(u + h_sample, v + v_sample);
-            c = c + colour(ray, &scene, 0);
+            c = c + colour(&scene.config, ray, &scene, 0);
         }
-        c = c.scale(1.0 / (SAMPLES as f64));
+        c = c.scale(1.0 / (scene.config.samples as f64));
         c = V3::new(c.x.sqrt(), c.y.sqrt(), c.z.sqrt());
         as_pixel(c)
     });
 
     let path = Path::new("out.png");
     ImageBuffer::save(&img, &path).expect("cannot save image");
+    Ok(())
 }

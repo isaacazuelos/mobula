@@ -5,5 +5,8 @@ authors = ["Isaac Azuelos <isaac@azuelos.ca>"]
 edition = "2018"
 
 [dependencies]
-image = "0.21"
-rand = "0.6"
+
+image = "0.21.0"
+rand = "0.6.5"
+serde = { features = ['derive'], version = "1.0.86" } 
+serde_json = "1.0.38"

@@ -1,9 +1,11 @@
+use serde::{Serialize, Deserialize};
+
 use crate::hit::{Hit, Hitable};
 use crate::material::Material;
 use crate::point::Point;
 use crate::ray::Ray;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 pub struct Sphere {
     pub centre: Point,
     pub radius: f64,
