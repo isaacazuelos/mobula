@@ -67,8 +67,8 @@ fn random_in_unit_sphere() -> V3 {
 
 impl Scatter for Lambertian {
     fn scatter(self, _: &Ray, hit: &Hit, attenuation: &mut V3, scattered: &mut Ray) -> bool {
-        let target = hit.intersection.to_v3() + hit.normal + random_in_unit_sphere();
-        *scattered = Ray::new(hit.intersection, target - hit.intersection.to_v3());
+        let target = V3::from(hit.intersection) + hit.normal + random_in_unit_sphere();
+        *scattered = Ray::new(hit.intersection, target - hit.intersection.into());
         *attenuation = self.albedo;
         true
     }

@@ -82,7 +82,7 @@ fn print_progress(x: u32, y: u32) {
 fn main() {
     let look_from = Point::new(3.0, 3.0, 2.0);
     let look_at = Point::new(0.0, 0.0, -1.0);
-    let focus_distance = (look_from.to_v3() - look_at.to_v3()).magnitude();
+    let focus_distance = (V3::from(look_from) - V3::from(look_at)).magnitude();
     let aperture = 2.0;
 
     let camera = Camera::new(

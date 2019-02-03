@@ -4,6 +4,8 @@ use std::ops::Mul;
 use std::ops::Neg;
 use std::ops::Sub;
 
+use crate::mobula::point::Point;
+
 #[derive(Copy, Clone, Debug)]
 pub struct V3 {
     pub x: f64,
@@ -82,6 +84,12 @@ impl V3 {
 impl Default for V3 {
     fn default() -> Self {
         Self::zero()
+    }
+}
+
+impl From<Point> for V3 {
+    fn from(p: Point) -> Self {
+        unsafe { ::std::mem::transmute(p) }
     }
 }
 

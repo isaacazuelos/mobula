@@ -38,7 +38,7 @@ impl Camera {
         let half_height = (theta / 2.0).tan();
         let half_width = half_height * aspect;
 
-        let w = (origin.to_v3() - look_at.to_v3()).normalize();
+        let w = (V3::from(origin) - V3::from(look_at)).normalize();
         let u = vup.cross(w).normalize();
         let v = w.cross(u);
         Camera {
@@ -48,8 +48,8 @@ impl Camera {
             v,
             horizontal: u.scale(2.0 * half_width * focus_distance),
             vertical: v.scale(2.0 * half_height * focus_distance),
-            lower_left_corner: Point::from_v3(
-                origin.to_v3()
+            lower_left_corner: Point::from(
+                V3::from(origin)
                     - u.scale(half_width * focus_distance)
                     - v.scale(half_height * focus_distance)
                     - w.scale(focus_distance),
@@ -62,8 +62,8 @@ impl Camera {
         let offset = self.u.scale(rd.x) + self.v.scale(rd.y);
         Ray::new(
             self.origin.translate(offset),
-            self.lower_left_corner.to_v3() + self.horizontal.scale(s) + self.vertical.scale(t)
-                - self.origin.to_v3()
+            V3::from(self.lower_left_corner) + self.horizontal.scale(s) + self.vertical.scale(t)
+                - self.origin.into()
                 - offset,
         )
     }

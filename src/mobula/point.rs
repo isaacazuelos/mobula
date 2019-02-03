@@ -22,14 +22,11 @@ impl Point {
     pub fn translate(self, v: V3) -> Point {
         Point::new(self.x + v.x, self.y + v.y, self.z + v.z)
     }
+}
 
-    // Make a point out of a vector.
-    pub fn from_v3(v: V3) -> Self {
-        Point::new(v.x, v.y, v.z)
-    }
 
-    // Turn a point into a vector, which is used a lot for math.
-    pub fn to_v3(self) -> V3 {
-        V3::new(self.x, self.y, self.z)
+impl From<V3> for Point {
+    fn from(v: V3) -> Self {
+        unsafe { ::std::mem::transmute(v) }
     }
 }
