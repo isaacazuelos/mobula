@@ -6,6 +6,7 @@ pub struct Config {
     pub height: u32,
     pub samples: u32,
     pub depth: u32,
+    pub progress: bool
 }
 
 impl Default for Config {
@@ -15,6 +16,7 @@ impl Default for Config {
             height: 300,
             samples: 8,
             depth: 8,
+            progress: false,
         }
     }
 }
