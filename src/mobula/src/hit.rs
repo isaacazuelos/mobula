@@ -9,21 +9,20 @@ pub trait Hitable {
 
 #[derive(Clone, Copy, Debug)]
 pub struct Hit {
-    pub t: f64,
     pub intersection: Point,
-    pub normal: V3,
     pub material: Material,
+    pub normal: V3,
+    // TODO: Can we maybe have a more descriptive name? (2019-02-03)
+    pub t: f64,
 }
 
-impl Hit {
-    // TODO: we shouldn't have a default hit. (2019-02-03)
-    pub fn new() -> Self {
+impl Default for Hit {
+    fn default() -> Hit {
         Hit {
-            t: 0.0,
             intersection: Point::origin(),
-            normal: V3::zero(),
             material: Material::default(),
+            normal: V3::default(),
+            t: 0.0,
         }
     }
 }
-

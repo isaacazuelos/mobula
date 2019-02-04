@@ -35,7 +35,7 @@ impl Hitable for Sphere {
             return None; // There are no collisions.
         }
 
-        let mut hit = Hit::new();
+        let mut hit = Hit::default();
         hit.material = self.material;
 
         // first we'll try the - branch of the +- in the quadratic equation.

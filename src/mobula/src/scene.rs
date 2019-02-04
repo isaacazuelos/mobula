@@ -1,8 +1,8 @@
-use std::io::{self, Write};
-
 use serde::{Deserialize, Serialize};
 
 use image::{ImageBuffer, Rgb};
+
+use indicatif;
 
 use crate::camera::CameraBuilder;
 use crate::config::Config;
@@ -12,20 +12,19 @@ use crate::ray::Ray;
 use crate::shape::Shape;
 use crate::v3::V3;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Default, Serialize, Deserialize)]
 pub struct Scene {
+    #[serde(default)]
     pub config: Config,
+    #[serde(default)]
     pub camera: CameraBuilder,
-    pub objects: Vec<Box<Shape>>,
+    #[serde(default)]
+    pub objects: Vec<Shape>,
 }
 
 impl Scene {
     pub fn new() -> Self {
-        Scene {
-            config: Config::default(),
-            camera: CameraBuilder::default(),
-            objects: Vec::new(),
-        }
+        Scene::default()
     }
 
     pub fn camera(mut self, camera: CameraBuilder) -> Self {
@@ -38,7 +37,7 @@ impl Scene {
         self
     }
 
-    pub fn add(mut self, object: Box<Shape>) -> Self {
+    pub fn push(mut self, object: Shape) -> Self {
         self.objects.push(object);
         self
     }
@@ -62,9 +61,10 @@ impl Scene {
         let camera = self.camera.build(&self.config);
         let width = self.config.width;
         let height = self.config.height;
+        let pb = indicatif::ProgressBar::new((width * height) as u64);
 
-        ImageBuffer::from_fn(width, height, |i, j| {
-            print_progress(&self.config, i, j);
+        let img = ImageBuffer::from_fn(width, height, |i, j| {
+            pb.inc(1);
 
             let u = (i as f64) / (width as f64);
             let v = ((height - j) as f64) / (height as f64);
@@ -79,7 +79,9 @@ impl Scene {
             c = c * (1.0 / (self.config.samples as f64));
             c = V3::new(c.x.sqrt(), c.y.sqrt(), c.z.sqrt());
             as_pixel(c)
-        })
+        });
+        pb.finish_with_message("complete!");
+        img
     }
 
     fn colour(&self, ray: Ray, depth: u32) -> V3 {
@@ -117,22 +119,4 @@ fn colour_background(ray: Ray) -> V3 {
     let unit = ray.direction().normalize();
     let t = 0.5 * unit.y + 1.0;
     linear_interpolation(V3::new(1.0, 1.0, 1.0), V3::new(0.5, 0.7, 1.0), t)
-}
-
-fn print_progress(config: &Config, x: u32, y: u32) {
-    if config.progress {
-        let current = (config.width * y) + x;
-        let max = config.width * config.height;
-        if current == 0 {
-            print!("rendering [");
-            let _ = io::stdout().flush();
-        } else if current % (max / 50) == 0 {
-            print!("#");
-            // failing to flush doesn't really matter.
-            let _ = io::stdout().flush();
-        }
-        if current == max - 1 {
-            println!("] complete!");
-        }
-    }
 }
