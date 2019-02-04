@@ -11,7 +11,7 @@ use std::f64::consts::PI;
 fn random_in_unit_disk() -> V3 {
     let mut p = V3::new(10.0, 0.0, 0.0);
     while p.magnitude() >= 1.0 {
-        p = (V3::new(random(), random(), 0.0) - V3::new(1.0, 1.0, 0.0)).scale(2.0);
+        p = (V3::new(random(), random(), 0.0) - V3::new(1.0, 1.0, 0.0)) * 2.0;
     }
     p
 }
@@ -51,7 +51,10 @@ impl CameraBuilder {
     pub fn build(self, config: &Config) -> Camera {
         let theta = self.fov * PI / 180.0;
         let half_height = (theta / 2.0).tan();
-        let half_width = half_height * self.aspect.unwrap_or(f64::from(config.width) / f64::from(config.height));
+        let half_width = half_height
+            * self
+                .aspect
+                .unwrap_or(f64::from(config.width) / f64::from(config.height));
 
         let w = (self.origin - self.target).normalize();
         let u = self.up.cross(w).normalize();
@@ -62,13 +65,13 @@ impl CameraBuilder {
             origin: self.origin,
             u,
             v,
-            horizontal: u.scale(2.0 * half_width * self.focus_distance),
-            vertical: v.scale(2.0 * half_height * self.focus_distance),
+            horizontal: u * (2.0 * half_width * self.focus_distance),
+            vertical: v * (2.0 * half_height * self.focus_distance),
             lower_left_corner: Point::from(
                 self.origin
-                    - u.scale(half_width * self.focus_distance)
-                    - v.scale(half_height * self.focus_distance)
-                    - w.scale(self.focus_distance),
+                    - (u * (half_width * self.focus_distance))
+                    - (v * (half_height * self.focus_distance))
+                    - (w * (self.focus_distance)),
             ),
         }
     }
@@ -122,11 +125,11 @@ pub struct Camera {
 
 impl Camera {
     pub fn get_ray(&self, s: f64, t: f64) -> Ray {
-        let rd = random_in_unit_disk().scale(self.lens_radius);
-        let offset = self.u.scale(rd.x) + self.v.scale(rd.y);
+        let rd = random_in_unit_disk() * self.lens_radius;
+        let offset = (self.u * rd.x) + (self.v * rd.y);
         Ray::new(
             self.origin.translate(offset),
-            self.lower_left_corner + self.horizontal.scale(s) + self.vertical.scale(t)
+            self.lower_left_corner + (self.horizontal * s) + (self.vertical * t)
                 - V3::from(self.origin)
                 - offset,
         )

@@ -26,11 +26,6 @@ impl V3 {
         V3::new(0.0, 0.0, 0.0)
     }
 
-    /// Multiply a vector by a scalar.
-    pub fn scale(self, factor: f64) -> Self {
-        V3::new(self.x * factor, self.y * factor, self.z * factor)
-    }
-
     /// The dot product of two vectors.
     pub fn dot(self, other: V3) -> f64 {
         (self.x * other.x) + (self.y * other.y) + (self.z * other.z)
@@ -48,7 +43,7 @@ impl V3 {
 
     /// reflect a vector using the normal of the surface it's reflecting off of.
     pub fn reflect(self, normal: V3) -> V3 {
-        self - normal.scale(2.0 * self.dot(normal))
+        self - normal * (2.0 * self.dot(normal))
     }
 
     /// refract a vector against a surface (using it's normal) and it's
@@ -58,9 +53,7 @@ impl V3 {
         let dt = uv.dot(normal);
         let discriminant = 1.0 - (ni_over_nt * ni_over_nt * (1.0 - dt * dt));
         if discriminant > 0.0 {
-            let refracted =
-                (uv - normal.scale(dt)).scale(ni_over_nt) - normal.scale(discriminant.sqrt());
-            Some(refracted)
+            Some(((uv - (normal * dt)) * ni_over_nt) - (normal * discriminant.sqrt()))
         } else {
             None
         }
@@ -72,7 +65,7 @@ impl V3 {
         if mag == 0.0 {
             V3::zero()
         } else {
-            self.scale(1.0 / mag)
+            self * (1.0 / mag)
         }
     }
 
@@ -112,7 +105,7 @@ impl Sub for V3 {
 impl Neg for V3 {
     type Output = V3;
     fn neg(self) -> V3 {
-        self.scale(-1.0)
+        self * (-1.0)
     }
 }
 
@@ -120,6 +113,13 @@ impl Mul for V3 {
     type Output = V3;
     fn mul(self, other: V3) -> V3 {
         V3::new(self.x * other.x, self.y * other.y, self.z * other.z)
+    }
+}
+
+impl Mul<f64> for V3 {
+    type Output = V3;
+    fn mul(self, other: f64) -> V3 {
+        V3::new(self.x * other, self.y * other, self.z * other)
     }
 }
 

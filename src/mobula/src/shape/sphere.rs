@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::hit::{Hit, Hitable};
 use crate::material::Material;
@@ -43,9 +43,7 @@ impl Hitable for Sphere {
         if temp < t_max && temp > t_min {
             hit.t = temp;
             hit.intersection = ray.at_parameter(hit.t);
-            hit.normal = (hit.intersection - self.centre)
-                .scale(1.0 / self.radius)
-                .normalize();
+            hit.normal = ((hit.intersection - self.centre) * (1.0 / self.radius)).normalize();
             return Some(hit);
         }
 
@@ -54,9 +52,7 @@ impl Hitable for Sphere {
         if temp < t_max && temp > t_min {
             hit.t = temp;
             hit.intersection = ray.at_parameter(hit.t);
-            hit.normal = (hit.intersection - self.centre)
-                .scale(1.0 / self.radius)
-                .normalize();
+            hit.normal = ((hit.intersection - self.centre) * (1.0 / self.radius)).normalize();
             return Some(hit);
         }
 

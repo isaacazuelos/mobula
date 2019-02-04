@@ -1,5 +1,5 @@
-use serde::{Serialize, Deserialize};
 use rand;
+use serde::{Deserialize, Serialize};
 
 use crate::hit::Hit;
 use crate::ray::Ray;
@@ -12,7 +12,7 @@ pub trait Scatter {
 
 // TODO: can this be a trait?
 #[derive(Copy, Clone, Debug, Serialize, Deserialize)]
-#[serde(tag="type")]
+#[serde(tag = "type")]
 pub enum Material {
     Lambertian(Lambertian),
     Metal(Metal),
@@ -61,8 +61,7 @@ pub struct Lambertian {
 fn random_in_unit_sphere() -> V3 {
     let mut p = V3::new(100.0, 0.0, 0.0);
     while p.magnitude() >= 1.0 {
-        p = V3::new(rand::random(), rand::random(), rand::random()).scale(2.0)
-            - V3::new(1.0, 1.0, 1.0);
+        p = V3::new(rand::random(), rand::random(), rand::random()) * 2.0 - V3::new(1.0, 1.0, 1.0);
     }
     p.normalize()
 }
@@ -95,7 +94,7 @@ impl Scatter for Metal {
         let reflected = ray.direction().normalize().reflect(hit.normal);
         *scattered = Ray::new(
             hit.intersection,
-            reflected + random_in_unit_sphere().scale(self.fuzz),
+            reflected + random_in_unit_sphere() * self.fuzz,
         );
         *attenuation = self.albedo;
         scattered.direction().dot(hit.normal) > 0.0
@@ -136,7 +135,7 @@ impl Scatter for Dialectric {
         };
 
         // TODO: is this sane? It's unused if it stays as this.
-        let mut refracted = V3::default(); 
+        let mut refracted = V3::default();
         let reflect_probability = match ray.direction().refract(outward_normal, ni_over_nt) {
             None => 1.0,
             Some(r) => {

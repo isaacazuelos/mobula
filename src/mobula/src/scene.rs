@@ -76,7 +76,7 @@ impl Scene {
                 let ray = camera.get_ray(u + h_sample, v + v_sample);
                 c = c + self.colour(ray, 0);
             }
-            c = c.scale(1.0 / (self.config.samples as f64));
+            c = c * (1.0 / (self.config.samples as f64));
             c = V3::new(c.x.sqrt(), c.y.sqrt(), c.z.sqrt());
             as_pixel(c)
         })
@@ -103,7 +103,7 @@ impl Scene {
 }
 
 fn linear_interpolation(start: V3, end: V3, t: f64) -> V3 {
-    start.scale(1.0 - t) + end.scale(t)
+    (start * (1.0 - t)) + (end * t)
 }
 
 fn as_pixel(colour: V3) -> image::Rgb<u8> {

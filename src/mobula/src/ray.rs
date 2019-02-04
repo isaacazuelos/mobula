@@ -26,7 +26,7 @@ impl Ray {
     }
 
     pub fn at_parameter(self, t: f64) -> Point {
-        self.origin.translate(self.direction.scale(t))
+        self.origin.translate(self.direction * t)
     }
 }
 
