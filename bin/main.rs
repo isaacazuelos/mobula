@@ -2,11 +2,69 @@
 
 use std::fs::File;
 
+use clap::value_t;
+
 use mobula::scene::Scene;
 
 fn main() -> Result<(), Box<::std::error::Error>> {
-    let file = File::open("scene1.json")?;
-    let scene: Scene = serde_json::from_reader(file)?;
+    let matches = clap::App::new("mobula")
+        .version(clap::crate_version!())
+        .about("A raytracer")
+        .author(clap::crate_authors!())
+        .setting(clap::AppSettings::ArgRequiredElseHelp)
+        .args(&[
+            clap::Arg::with_name("scene")
+                .help("A scene file")
+                .long_help(
+                    "The scene file used by the raytracer must be in
+JSON format, and contains information about the
+objects, camera, and rendering settings.",
+                )
+                .value_name("FILE")
+                .index(1)
+                .takes_value(true)
+                .required(true),
+            clap::Arg::with_name("width")
+                .help("the width of the rendered image")
+                .long("width")
+                .short("w")
+                .takes_value(true),
+            clap::Arg::with_name("height")
+                .help("the height of the rendered image")
+                .long("height")
+                .short("h")
+                .takes_value(true),
+            clap::Arg::with_name("depth")
+                .help("Maximum depth of reflections")
+                .long("depth")
+                .short("d")
+                .takes_value(true),
+            clap::Arg::with_name("samples")
+                .help("the number of samples per pixel")
+                .long("samples")
+                .short("s")
+                .takes_value(true),
+        ])
+        .get_matches();
+
+    // `unwrap` is safe as it's a required arg.
+    let file = File::open(matches.value_of("scene").unwrap())?;
+    let mut scene: Scene = serde_json::from_reader(file)?;
+
+    // we need to overwrite the scene config based on command line args.
+    if matches.is_present("width") {
+        scene.config.width = value_t!(matches, "width", u32).unwrap_or_else(|e| e.exit());
+    }
+    if matches.is_present("height") {
+        scene.config.height = value_t!(matches, "height", u32).unwrap_or_else(|e| e.exit());
+    }
+    if matches.is_present("depth") {
+        scene.config.depth = value_t!(matches, "depth", u32).unwrap_or_else(|e| e.exit());
+    }
+    if matches.is_present("samples") {
+        scene.config.samples = value_t!(matches, "samples", u32).unwrap_or_else(|e| e.exit());
+    }
+
     let img = scene.render();
 
     img.save("out.png")?;

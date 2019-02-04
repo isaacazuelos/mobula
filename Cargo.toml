@@ -12,4 +12,6 @@ path = "bin/main.rs"
 
 [dependencies]
 mobula = { path = "src/mobula" }
+
+clap = { version = "2.32.0", features = ["wrap_help", "color"] }
 serde_json = "1.0.38"
