@@ -4,8 +4,8 @@
 #![allow(clippy::cast_lossless)]
 
 pub mod camera;
+pub mod colour;
 pub mod config;
-
 pub mod material;
 pub mod point;
 pub mod ray;

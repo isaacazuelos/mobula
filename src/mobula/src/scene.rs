@@ -4,6 +4,7 @@ use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use crate::camera::{Camera, CameraBuilder};
+use crate::colour::Colour;
 use crate::config::Config;
 use crate::hit::{Hit, Hitable};
 use crate::material::Scatter;
@@ -56,7 +57,7 @@ impl Scene {
         hit
     }
 
-    pub fn render_par(&self) -> Vec<(u8, u8, u8)> {
+    pub fn render_par(&self) -> Vec<Colour> {
         let width = self.config.width;
         let height = self.config.height;
         let camera = self.camera.build(&self.config);
@@ -65,7 +66,7 @@ impl Scene {
         progress_bar.set_draw_delta(1000);
         progress_bar.set_style(
             indicatif::ProgressStyle::default_bar()
-                .template("{msg} [{wide_bar}] {eta_precise} ({pos:>7}/{len:7})")
+                .template("{msg} {elapsed} [{wide_bar}] {eta_precise} ({pos:>7}/{len:7})")
                 .progress_chars("=> "),
         );
         progress_bar.set_message("rendering");
@@ -80,11 +81,11 @@ impl Scene {
             })
             .collect();
 
-        progress_bar.finish_with_message("complete!");
+        progress_bar.finish_with_message("complete in");
         bytes
     }
 
-    pub fn render_pixel(&self, i: u32, j: u32, camera: &Camera) -> (u8, u8, u8) {
+    pub fn render_pixel(&self, i: u32, j: u32, camera: &Camera) -> Colour {
         let width = self.config.width;
         let height = self.config.height;
 
@@ -96,15 +97,12 @@ impl Scene {
             let h_sample = rand::random::<f64>() / (width as f64);
             let v_sample = rand::random::<f64>() / (height as f64);
             let ray = camera.get_ray(u + h_sample, v + v_sample);
-            c = c + self.colour(ray, 0);
+            c = c + self.colour(ray, 0).into();
         }
         c = c * (1.0 / (self.config.samples as f64));
         c = V3::new(c.x.sqrt(), c.y.sqrt(), c.z.sqrt());
 
-        let ir = (255.99 * c.x) as u8;
-        let ig = (255.99 * c.y) as u8;
-        let ib = (255.99 * c.z) as u8;
-        (ir, ig, ib)
+        Colour::from(c)
     }
 
     pub fn render(&self) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
@@ -112,40 +110,32 @@ impl Scene {
 
         ImageBuffer::from_fn(self.config.width, self.config.height, |x, y| {
             let pixel_index: usize = ((y * self.config.width) + x) as usize;
-            as_pixel(buf[pixel_index])
+            buf[pixel_index].into()
         })
     }
 
-    fn colour(&self, ray: Ray, depth: u32) -> V3 {
+    fn colour(&self, ray: Ray, depth: u32) -> Colour {
         match self.nearest_hit(&ray, 0.001, std::f64::MAX) {
-            None => colour_background(ray),
+            None => Scene::background(ray),
             Some(hit) => {
                 let mut scattered = Ray::default();
-                let mut attenuation = V3::default();
+                let mut attenuation = Colour::black();
                 if depth < self.config.depth
                     && hit
                         .material
                         .scatter(&ray, &hit, &mut attenuation, &mut scattered)
                 {
-                    attenuation * self.colour(scattered, depth + 1)
+                    Colour::black() * self.colour(scattered, depth + 1)
                 } else {
-                    V3::zero()
+                    Colour::black()
                 }
             }
         }
     }
-}
 
-fn linear_interpolation(start: V3, end: V3, t: f64) -> V3 {
-    (start * (1.0 - t)) + (end * t)
-}
-
-fn as_pixel((r, g, b): (u8, u8, u8)) -> image::Rgb<u8> {
-    image::Rgb([r, g, b])
-}
-
-fn colour_background(ray: Ray) -> V3 {
-    let unit = ray.direction().normalize();
-    let t = 0.5 * unit.y + 1.0;
-    linear_interpolation(V3::new(1.0, 1.0, 1.0), V3::new(0.5, 0.7, 1.0), t)
+    fn background(ray: Ray) -> Colour {
+        let unit = ray.direction().normalize();
+        let t = unit.y.abs();
+        Colour::linear_interpolation(Colour::new(1.0, 1.0, 1.0), Colour::new(0.5, 0.7, 1.0), t)
+    }
 }

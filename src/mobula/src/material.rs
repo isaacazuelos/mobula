@@ -2,12 +2,13 @@ use rand;
 use serde::{Deserialize, Serialize};
 
 use crate::hit::Hit;
+use crate::colour::Colour;
 use crate::ray::Ray;
 use crate::v3::V3;
 
 pub trait Scatter {
     // TODO: this isn't a very rusty signature, but I want to get it working first.
-    fn scatter(self, ray: &Ray, hit: &Hit, attenuation: &mut V3, scattered: &mut Ray) -> bool;
+    fn scatter(self, ray: &Ray, hit: &Hit, attenuation: &mut Colour, scattered: &mut Ray) -> bool;
 }
 
 // TODO: can this be a trait?
@@ -22,13 +23,13 @@ pub enum Material {
 impl Material {
     pub fn lambertian(r: f64, g: f64, b: f64) -> Self {
         Material::Lambertian(Lambertian {
-            albedo: V3::new(r, g, b),
+            albedo: Colour::new(r, g, b),
         })
     }
     pub fn metal(r: f64, g: f64, b: f64, fuzz: f64) -> Self {
         Material::Metal(Metal {
             fuzz,
-            albedo: V3::new(r, g, b),
+            albedo: Colour::new(r, g, b),
         })
     }
     pub fn dialectric(refractive_index: f64) -> Self {
@@ -37,7 +38,7 @@ impl Material {
 }
 
 impl Scatter for Material {
-    fn scatter(self, ray: &Ray, hit: &Hit, attenuation: &mut V3, scattered: &mut Ray) -> bool {
+    fn scatter(self, ray: &Ray, hit: &Hit, attenuation: &mut Colour, scattered: &mut Ray) -> bool {
         match self {
             Material::Lambertian(m) => m.scatter(ray, hit, attenuation, scattered),
             Material::Metal(m) => m.scatter(ray, hit, attenuation, scattered),
@@ -55,7 +56,7 @@ impl Default for Material {
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 pub struct Lambertian {
-    albedo: V3,
+    albedo: Colour,
 }
 
 fn random_in_unit_sphere() -> V3 {
@@ -67,7 +68,7 @@ fn random_in_unit_sphere() -> V3 {
 }
 
 impl Scatter for Lambertian {
-    fn scatter(self, _: &Ray, hit: &Hit, attenuation: &mut V3, scattered: &mut Ray) -> bool {
+    fn scatter(self, _: &Ray, hit: &Hit, attenuation: &mut Colour, scattered: &mut Ray) -> bool {
         let target = hit.intersection + hit.normal + random_in_unit_sphere();
         *scattered = Ray::new(hit.intersection, target - hit.intersection.into());
         *attenuation = self.albedo;
@@ -78,19 +79,19 @@ impl Scatter for Lambertian {
 impl Default for Lambertian {
     fn default() -> Self {
         Lambertian {
-            albedo: V3::new(0.5, 0.5, 0.5),
+            albedo: Colour::new(0.5, 0.5, 0.5),
         }
     }
 }
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 pub struct Metal {
-    albedo: V3,
+    albedo: Colour,
     fuzz: f64,
 }
 
 impl Scatter for Metal {
-    fn scatter(self, ray: &Ray, hit: &Hit, attenuation: &mut V3, scattered: &mut Ray) -> bool {
+    fn scatter(self, ray: &Ray, hit: &Hit, attenuation: &mut Colour, scattered: &mut Ray) -> bool {
         let reflected = ray.direction().normalize().reflect(hit.normal);
         *scattered = Ray::new(
             hit.intersection,
@@ -115,9 +116,9 @@ impl Dialectric {
 }
 
 impl Scatter for Dialectric {
-    fn scatter(self, ray: &Ray, hit: &Hit, attenuation: &mut V3, scattered: &mut Ray) -> bool {
+    fn scatter(self, ray: &Ray, hit: &Hit, attenuation: &mut Colour, scattered: &mut Ray) -> bool {
         let reflected = ray.direction().reflect(hit.normal);
-        *attenuation = V3::new(1.0, 1.0, 1.0);
+        *attenuation = Colour::new(1.0, 1.0, 1.0);
 
         let (outward_normal, ni_over_nt, cosine) = if ray.direction().dot(hit.normal) > 0.0 {
             (
