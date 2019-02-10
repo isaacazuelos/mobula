@@ -3,7 +3,7 @@ use indicatif;
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::camera::{CameraBuilder, Camera};
+use crate::camera::{Camera, CameraBuilder};
 use crate::config::Config;
 use crate::hit::{Hit, Hitable};
 use crate::material::Scatter;
@@ -62,6 +62,13 @@ impl Scene {
         let camera = self.camera.build(&self.config);
 
         let progress_bar = indicatif::ProgressBar::new((width * height) as u64);
+        progress_bar.set_draw_delta(1000);
+        progress_bar.set_style(
+            indicatif::ProgressStyle::default_bar()
+                .template("{msg} [{wide_bar}] {eta_precise} ({pos:>7}/{len:7})")
+                .progress_chars("=> "),
+        );
+        progress_bar.set_message("rendering");
 
         let bytes = (0..(self.config.width * self.config.height))
             .into_par_iter()

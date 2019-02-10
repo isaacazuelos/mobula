@@ -9,14 +9,14 @@ use mobula::scene::Scene;
 fn main() -> Result<(), Box<::std::error::Error>> {
     let matches = clap::App::new("mobula")
         .version(clap::crate_version!())
-        .about("A raytracer")
+        .about("A ray tracer")
         .author(clap::crate_authors!())
         .setting(clap::AppSettings::ArgRequiredElseHelp)
         .args(&[
             clap::Arg::with_name("scene")
                 .help("A scene file")
                 .long_help(
-                    "The scene file used by the raytracer must be in
+                    "The scene file used by the ray tracer must be in
 JSON format, and contains information about the
 objects, camera, and rendering settings.",
                 )
@@ -44,6 +44,13 @@ objects, camera, and rendering settings.",
                 .long("samples")
                 .short("s")
                 .takes_value(true),
+            clap::Arg::with_name("out")
+                .help("write output to FILE")
+                .long("out")
+                .short("o")
+                .value_name("FILE")
+                .default_value("a.png")
+                .takes_value(true),
         ])
         .get_matches();
 
@@ -67,6 +74,9 @@ objects, camera, and rendering settings.",
 
     let img = scene.render();
 
-    img.save("out.png")?;
+    // `unwrap` is safe as it has a default
+    let out_path = matches.value_of("out").unwrap();
+    println!("writing file to {}", &out_path);
+    img.save(&out_path)?;
     Ok(())
 }

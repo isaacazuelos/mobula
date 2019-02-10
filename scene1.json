@@ -1,9 +1,9 @@
 {
   "config": {
-    "width": 800,
-    "height": 600,
-    "samples": 256,
-    "depth": 256
+    "width": 1280,
+    "height": 720,
+    "samples": 512,
+    "depth": 512
   },
   "camera": {
     "origin": {
