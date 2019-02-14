@@ -24,38 +24,30 @@ impl Sphere {
 
 impl Hitable for Sphere {
     fn is_hit_by(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
+
         // first, we use the quadratic formula to solve for the roots (number of intersections).
         let oc = ray.origin() - self.centre;
         let a = ray.direction().dot(ray.direction());
         let b = oc.dot(ray.direction());
         let c = oc.dot(oc) - self.radius * self.radius;
+        
         let discriminant = b * b - a * c;
+        // t1 and t2 are the two solutions to our quadratic
+        let t1 = (-b - discriminant.sqrt()) / a;
+        let t2 = (-b + discriminant.sqrt()) / a;
 
         if discriminant < 0.0 {
-            return None; // There are no collisions.
+            None // There are no collisions.
+        } else if t1 < t_max && t1 > t_min {
+            let intersection = ray.at_parameter(t1);
+            let normal = ((intersection - self.centre) * (1.0 / self.radius)).normalize();
+            Some(Hit::new(intersection, normal, self.material, t1))
+        } else if t2 < t_max && t2 > t_min {
+            let intersection = ray.at_parameter(t2);
+            let normal = ((intersection - self.centre) * (1.0 / self.radius)).normalize();
+            Some(Hit::new(intersection, normal, self.material, t2))
+        } else {
+            None
         }
-
-        let mut hit = Hit::default();
-        hit.material = self.material;
-
-        // first we'll try the - branch of the +- in the quadratic equation.
-        let temp = (-b - (b * b - a * c).sqrt()) / a;
-        if temp < t_max && temp > t_min {
-            hit.t = temp;
-            hit.intersection = ray.at_parameter(hit.t);
-            hit.normal = ((hit.intersection - self.centre) * (1.0 / self.radius)).normalize();
-            return Some(hit);
-        }
-
-        // now the + branch
-        let temp = (-b + (b * b - a * c).sqrt()) / a;
-        if temp < t_max && temp > t_min {
-            hit.t = temp;
-            hit.intersection = ray.at_parameter(hit.t);
-            hit.normal = ((hit.intersection - self.centre) * (1.0 / self.radius)).normalize();
-            return Some(hit);
-        }
-
-        None
     }
 }
