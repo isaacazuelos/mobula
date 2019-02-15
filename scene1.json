@@ -22,15 +22,13 @@
       "z": 0.0
     },
     "fov": 20.0,
-    "aspect": null,
-    "aperture": 2.0,
-    "focus_distance": 5.196152422706632
+    "aperture": 0.25
   },
   "objects": [
     {
       "type": "Sphere",
       "centre": {
-        "x": 0.0,
+        "x": -1.0,
         "y": 0.0,
         "z": -1.0
       },
@@ -82,7 +80,7 @@
     {
       "type": "Sphere",
       "centre": {
-        "x": -1.0,
+        "x": 0.0,
         "y": 0.0,
         "z": -1.0
       },
@@ -95,7 +93,7 @@
     {
       "type": "Sphere",
       "centre": {
-        "x": -1.0,
+        "x": 0.0,
         "y": 0.0,
         "z": -1.0
       },
