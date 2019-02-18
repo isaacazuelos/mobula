@@ -22,9 +22,12 @@ pub struct CameraBuilder {
     target: Point,
     up: V3,
     fov: f64,
-    aspect: Option<f64>, // None means compute from config
+    #[serde(default)]
     aperture: f64,
-    focus_distance: f64,
+    #[serde(default)]
+    aspect: Option<f64>, // None means compute from config
+    #[serde(default)]
+    focus_distance: Option<f64>, // None means focus on target
 }
 
 impl Default for CameraBuilder {
@@ -38,7 +41,7 @@ impl Default for CameraBuilder {
             fov: 20.0,
             aspect: None,
             aperture: 2.0,
-            focus_distance: (origin - target).magnitude(),
+            focus_distance: None,
         }
     }
 }
@@ -46,6 +49,13 @@ impl Default for CameraBuilder {
 impl CameraBuilder {
     pub fn new() -> CameraBuilder {
         Self::default()
+    }
+
+    fn auto_focus_distance(&self) -> f64 {
+        match self.focus_distance {
+            None => (self.origin - self.target).magnitude(),
+            Some(f) => f,
+        }
     }
 
     pub fn build(self, config: &Config) -> Camera {
@@ -65,13 +75,13 @@ impl CameraBuilder {
             origin: self.origin,
             u,
             v,
-            horizontal: u * (2.0 * half_width * self.focus_distance),
-            vertical: v * (2.0 * half_height * self.focus_distance),
+            horizontal: u * (2.0 * half_width * self.auto_focus_distance()),
+            vertical: v * (2.0 * half_height * self.auto_focus_distance()),
             lower_left_corner: Point::from(
                 self.origin
-                    - (u * (half_width * self.focus_distance))
-                    - (v * (half_height * self.focus_distance))
-                    - (w * (self.focus_distance)),
+                    - (u * (half_width * self.auto_focus_distance()))
+                    - (v * (half_height * self.auto_focus_distance()))
+                    - (w * (self.auto_focus_distance())),
             ),
         }
     }
@@ -107,7 +117,7 @@ impl CameraBuilder {
     }
 
     pub fn focus_distance(mut self, value: f64) -> Self {
-        self.focus_distance = value;
+        self.focus_distance = Some(value);
         self
     }
 }
