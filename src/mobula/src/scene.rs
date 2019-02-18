@@ -7,10 +7,8 @@ use crate::camera::{Camera, CameraBuilder};
 use crate::colour::Colour;
 use crate::config::Config;
 use crate::hit::{Hit, Hitable};
-use crate::material::Scatter;
 use crate::ray::Ray;
 use crate::shape::Shape;
-use crate::v3::V3;
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct Scene {
@@ -92,17 +90,17 @@ impl Scene {
         let u = (i as f64) / (width as f64);
         let v = ((height - j) as f64) / (height as f64);
 
-        let mut c = V3::zero();
-        for _ in 0..self.config.samples {
+        let mut c = Colour::black();
+        for i in 0..self.config.samples {
             let h_sample = rand::random::<f64>() / (width as f64);
             let v_sample = rand::random::<f64>() / (height as f64);
-            let ray = camera.get_ray(u + h_sample, v + v_sample);
-            c = c + self.colour(ray, 0).into();
-        }
-        c = c * (1.0 / (self.config.samples as f64));
-        c = V3::new(c.x.sqrt(), c.y.sqrt(), c.z.sqrt());
 
-        Colour::from(c)
+            let ray = camera.get_ray(u + h_sample, v + v_sample);
+
+            c = Colour::linear_interpolation(c, self.colour(ray, 0), 1.0 / ((i + 1) as f64));
+        }
+
+        Colour::new(c.r.sqrt(), c.g.sqrt(), c.b.sqrt())
     }
 
     pub fn render(&self) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
@@ -118,14 +116,11 @@ impl Scene {
         match self.nearest_hit(&ray, 0.001, std::f64::MAX) {
             None => Scene::background(ray),
             Some(hit) => {
-                let mut scattered = Ray::default();
-                let mut attenuation = Colour::black();
-                if depth < self.config.depth
-                    && hit
-                        .material
-                        .scatter(&ray, &hit, &mut attenuation, &mut scattered)
-                {
-                    Colour::black() * self.colour(scattered, depth + 1)
+                if depth < self.config.depth {
+                    match hit.scatter(&ray) {
+                        Some((attenuation, scattered)) => attenuation * self.colour(scattered, depth + 1),
+                        None => Colour::black(),
+                    }
                 } else {
                     Colour::black()
                 }

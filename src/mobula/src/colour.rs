@@ -7,9 +7,9 @@ use crate::v3::V3;
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 pub struct Colour {
-    r: f64,
-    g: f64,
-    b: f64,
+    pub r: f64,
+    pub g: f64,
+    pub b: f64,
 }
 
 impl Colour {
@@ -42,9 +42,6 @@ impl Colour {
 }
 
 impl Default for Colour {
-    /// A default colour is useful for initializing data, but we want to be
-    /// able to make sure it's not actually used uninitialized. That's why the
-    /// default colour is a hard magenta -- which makes it easy to spot.
     fn default() -> Colour {
         Colour {
             r: 0.0,

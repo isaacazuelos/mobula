@@ -1,4 +1,5 @@
-use crate::material::Material;
+use crate::colour::Colour;
+use crate::material::{Material, Scatter};
 use crate::point::Point;
 use crate::ray::Ray;
 use crate::v3::V3;
@@ -21,5 +22,9 @@ impl Hit {
         Hit {
             intersection, normal, material, t
         }
+    }
+    
+    pub fn scatter(&self, ray: &Ray) -> Option<(Colour, Ray)> {
+        self.material.scatter(ray, self)
     }
 }

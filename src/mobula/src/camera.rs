@@ -20,6 +20,7 @@ fn random_in_unit_disk() -> V3 {
 pub struct CameraBuilder {
     origin: Point,
     target: Point,
+    #[serde(default = "CameraBuilder::default_up")]
     up: V3,
     fov: f64,
     #[serde(default)]
@@ -49,6 +50,10 @@ impl Default for CameraBuilder {
 impl CameraBuilder {
     pub fn new() -> CameraBuilder {
         Self::default()
+    }
+
+    fn default_up() -> V3 {
+        V3::new(0.0, 1.0, 0.0)
     }
 
     fn auto_focus_distance(&self) -> f64 {

@@ -1,14 +1,13 @@
 use rand;
 use serde::{Deserialize, Serialize};
 
-use crate::hit::Hit;
 use crate::colour::Colour;
+use crate::hit::Hit;
 use crate::ray::Ray;
 use crate::v3::V3;
 
 pub trait Scatter {
-    // TODO: this isn't a very rusty signature, but I want to get it working first.
-    fn scatter(self, ray: &Ray, hit: &Hit, attenuation: &mut Colour, scattered: &mut Ray) -> bool;
+    fn scatter(self, ray: &Ray, hit: &Hit) -> Option<(Colour, Ray)>;
 }
 
 // TODO: can this be a trait?
@@ -38,11 +37,11 @@ impl Material {
 }
 
 impl Scatter for Material {
-    fn scatter(self, ray: &Ray, hit: &Hit, attenuation: &mut Colour, scattered: &mut Ray) -> bool {
+    fn scatter(self, ray: &Ray, hit: &Hit) -> Option<(Colour, Ray)> {
         match self {
-            Material::Lambertian(m) => m.scatter(ray, hit, attenuation, scattered),
-            Material::Metal(m) => m.scatter(ray, hit, attenuation, scattered),
-            Material::Dialectric(m) => m.scatter(ray, hit, attenuation, scattered),
+            Material::Lambertian(m) => m.scatter(ray, hit),
+            Material::Metal(m) => m.scatter(ray, hit),
+            Material::Dialectric(m) => m.scatter(ray, hit),
         }
     }
 }
@@ -68,11 +67,13 @@ fn random_in_unit_sphere() -> V3 {
 }
 
 impl Scatter for Lambertian {
-    fn scatter(self, _: &Ray, hit: &Hit, attenuation: &mut Colour, scattered: &mut Ray) -> bool {
+    fn scatter(self, _ray: &Ray, hit: &Hit) -> Option<(Colour, Ray)> {
         let target = hit.intersection + hit.normal + random_in_unit_sphere();
-        *scattered = Ray::new(hit.intersection, target - hit.intersection.into());
-        *attenuation = self.albedo;
-        true
+
+        Some((
+            self.albedo,
+            Ray::new(hit.intersection, target - hit.intersection.into()),
+        ))
     }
 }
 
@@ -91,14 +92,17 @@ pub struct Metal {
 }
 
 impl Scatter for Metal {
-    fn scatter(self, ray: &Ray, hit: &Hit, attenuation: &mut Colour, scattered: &mut Ray) -> bool {
+    fn scatter(self, ray: &Ray, hit: &Hit) -> Option<(Colour, Ray)> {
         let reflected = ray.direction().normalize().reflect(hit.normal);
-        *scattered = Ray::new(
+        let scattered = Ray::new(
             hit.intersection,
             reflected + random_in_unit_sphere() * self.fuzz,
         );
-        *attenuation = self.albedo;
-        scattered.direction().dot(hit.normal) > 0.0
+        if scattered.direction().dot(hit.normal) > 0.0 {
+            Some((self.albedo, scattered))
+        } else {
+            None
+        }
     }
 }
 
@@ -116,9 +120,10 @@ impl Dialectric {
 }
 
 impl Scatter for Dialectric {
-    fn scatter(self, ray: &Ray, hit: &Hit, attenuation: &mut Colour, scattered: &mut Ray) -> bool {
+    fn scatter(self, ray: &Ray, hit: &Hit) -> Option<(Colour, Ray)> {
         let reflected = ray.direction().reflect(hit.normal);
-        *attenuation = Colour::new(1.0, 1.0, 1.0);
+        
+        let colour = Colour::white();
 
         let (outward_normal, ni_over_nt, cosine) = if ray.direction().dot(hit.normal) > 0.0 {
             (
@@ -147,7 +152,7 @@ impl Scatter for Dialectric {
 
         let rand: f64 = rand::random();
 
-        *scattered = Ray::new(
+        let scattered = Ray::new(
             hit.intersection,
             if rand < reflect_probability {
                 reflected
@@ -156,6 +161,6 @@ impl Scatter for Dialectric {
             },
         );
 
-        true
+        Some((colour, scattered))
     }
 }
