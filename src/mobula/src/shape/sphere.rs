@@ -23,9 +23,11 @@ impl Sphere {
 }
 
 impl Hitable for Sphere {
+    // TODO: we should really have a better name than t_min and t_max
     fn is_hit_by(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<Hit> {
 
-        // first, we use the quadratic formula to solve for the roots (number of intersections).
+        // first, we use the quadratic formula to solve for the roots (number of
+        // intersections).
         let oc = ray.origin() - self.centre;
         let a = ray.direction().dot(ray.direction());
         let b = oc.dot(ray.direction());

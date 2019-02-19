@@ -9,6 +9,7 @@ pub mod sphere;
 // making a trait object of shapes.
 #[derive(Debug, Clone, Copy, Deserialize, Serialize)]
 #[serde(tag="type")]
+#[serde(rename_all = "snake_case")]
 pub enum Shape {
     Sphere(sphere::Sphere),
 }
