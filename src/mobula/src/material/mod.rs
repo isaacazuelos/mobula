@@ -10,9 +10,9 @@ mod dialectric;
 mod lambertian;
 mod metal;
 
-use dialectric::Dialectric;
-use lambertian::Lambertian;
-use metal::Metal;
+use crate::material::dialectric::Dialectric;
+use crate::material::lambertian::Lambertian;
+use crate::material::metal::Metal;
 
 pub trait Scatter {
     fn scatter(self, ray: &Ray, hit: &Hit) -> Option<(Colour, Ray)>;
