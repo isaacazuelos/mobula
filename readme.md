@@ -42,7 +42,9 @@ $ ./target/release/mobula
 
 ## Usage
 
-All it does is render the static image — there are no command line options.
+Needs an input file, try the included `scene1.json`.
+
+Try `--help` to dsee what you can change.
 
 ## License
 
