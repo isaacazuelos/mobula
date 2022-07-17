@@ -22,7 +22,7 @@ impl Scatter for Metal {
         let reflected = ray.direction().normalize().reflect(hit.normal);
         let scattered = Ray::new(
             hit.intersection,
-            reflected + (Scatter::random_in_unit_sphere() * self.fuzz),
+            reflected + (<dyn Scatter>::random_in_unit_sphere() * self.fuzz),
         );
         if scattered.direction().dot(hit.normal) > 0.0 {
             Some((self.albedo, scattered))

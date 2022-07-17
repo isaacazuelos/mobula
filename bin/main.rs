@@ -1,12 +1,8 @@
-//! TODO: Document (2019-02-01)
-
 use std::fs::File;
-
-use clap::value_t;
 
 use mobula::scene::Scene;
 
-fn main() -> Result<(), Box<::std::error::Error>> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let matches = clap::App::new("mobula")
         .version(clap::crate_version!())
         .about("A ray tracer")
@@ -27,27 +23,27 @@ objects, camera, and rendering settings.",
             clap::Arg::with_name("width")
                 .help("the width of the rendered image")
                 .long("width")
-                .short("w")
+                .short('w')
                 .takes_value(true),
             clap::Arg::with_name("height")
                 .help("the height of the rendered image")
                 .long("height")
-                .short("h")
+                .short('h')
                 .takes_value(true),
             clap::Arg::with_name("depth")
                 .help("Maximum depth of reflections")
                 .long("depth")
-                .short("d")
+                .short('d')
                 .takes_value(true),
             clap::Arg::with_name("samples")
                 .help("the number of samples per pixel")
                 .long("samples")
-                .short("s")
+                .short('s')
                 .takes_value(true),
             clap::Arg::with_name("out")
                 .help("write output to FILE")
                 .long("out")
-                .short("o")
+                .short('o')
                 .value_name("FILE")
                 .default_value("a.png")
                 .takes_value(true),
@@ -60,16 +56,16 @@ objects, camera, and rendering settings.",
 
     // we need to overwrite the scene config based on command line args.
     if matches.is_present("width") {
-        scene.config.width = value_t!(matches, "width", u32).unwrap_or_else(|e| e.exit());
+        scene.config.width = clap::value_t!(matches, "width", u32).unwrap_or_else(|e| e.exit());
     }
     if matches.is_present("height") {
-        scene.config.height = value_t!(matches, "height", u32).unwrap_or_else(|e| e.exit());
+        scene.config.height = clap::value_t!(matches, "height", u32).unwrap_or_else(|e| e.exit());
     }
     if matches.is_present("depth") {
-        scene.config.depth = value_t!(matches, "depth", u32).unwrap_or_else(|e| e.exit());
+        scene.config.depth = clap::value_t!(matches, "depth", u32).unwrap_or_else(|e| e.exit());
     }
     if matches.is_present("samples") {
-        scene.config.samples = value_t!(matches, "samples", u32).unwrap_or_else(|e| e.exit());
+        scene.config.samples = clap::value_t!(matches, "samples", u32).unwrap_or_else(|e| e.exit());
     }
 
     let img = scene.render();

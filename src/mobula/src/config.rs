@@ -16,7 +16,7 @@ impl Default for Config {
     fn default() -> Self {
         Config {
             height: 300,
-            width: 400, 
+            width: 400,
             depth: Config::DEFAULT_DEPTH,
             samples: 8,
         }
@@ -33,7 +33,7 @@ impl Config {
     fn default_height() -> u32 {
         Config::DEFAULT_HEIGHT
     }
-    
+
     fn default_width() -> u32 {
         Config::DEFAULT_WIDTH
     }

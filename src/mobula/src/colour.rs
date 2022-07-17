@@ -14,9 +14,9 @@ pub struct Colour {
 
 impl Colour {
     pub fn new(r: f64, g: f64, b: f64) -> Self {
-        assert!(r <= 1.0 && r >= 0.0);
-        assert!(g <= 1.0 && g >= 0.0);
-        assert!(b <= 1.0 && b >= 0.0);
+        debug_assert!((0.0..=1.0).contains(&r));
+        debug_assert!((0.0..=1.0).contains(&g));
+        debug_assert!((0.0..=1.0).contains(&g));
         Colour { r, g, b }
     }
 
@@ -76,17 +76,17 @@ impl From<V3> for Colour {
     }
 }
 
-impl Into<V3> for Colour {
-    fn into(self) -> V3 {
-        V3::new(self.r, self.g, self.b)
+impl From<Colour> for V3 {
+    fn from(val: Colour) -> Self {
+        V3::new(val.r, val.g, val.b)
     }
 }
 
-impl Into<image::Rgb<u8>> for Colour {
-    fn into(self) -> image::Rgb<u8> {
-        let r = (255.0 * self.r) as u8;
-        let g = (255.0 * self.g) as u8;
-        let b = (255.0 * self.b) as u8;
+impl From<Colour> for image::Rgb<u8> {
+    fn from(val: Colour) -> Self {
+        let r = (255.0 * val.r) as u8;
+        let g = (255.0 * val.g) as u8;
+        let b = (255.0 * val.b) as u8;
 
         image::Rgb([r, g, b])
     }

@@ -18,7 +18,7 @@ impl Lambertian {
 
 impl Scatter for Lambertian {
     fn scatter(self, _ray: &Ray, hit: &Hit) -> Option<(Colour, Ray)> {
-        let target = hit.intersection + hit.normal + Scatter::random_in_unit_sphere();
+        let target = hit.intersection + hit.normal + <dyn Scatter>::random_in_unit_sphere();
 
         Some((
             self.albedo,

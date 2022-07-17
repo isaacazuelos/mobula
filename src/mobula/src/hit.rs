@@ -20,10 +20,13 @@ pub struct Hit {
 impl Hit {
     pub fn new(intersection: Point, normal: V3, material: Material, t: f64) -> Self {
         Hit {
-            intersection, normal, material, t
+            intersection,
+            normal,
+            material,
+            t,
         }
     }
-    
+
     pub fn scatter(&self, ray: &Ray) -> Option<(Colour, Ray)> {
         self.material.scatter(ray, self)
     }

@@ -12,5 +12,5 @@ pub mod ray;
 pub mod scene;
 pub mod shape;
 
-mod v3;
 mod hit;
+mod v3;

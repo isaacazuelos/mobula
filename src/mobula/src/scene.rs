@@ -118,7 +118,9 @@ impl Scene {
             Some(hit) => {
                 if depth < self.config.depth {
                     match hit.scatter(&ray) {
-                        Some((attenuation, scattered)) => attenuation * self.colour(scattered, depth + 1),
+                        Some((attenuation, scattered)) => {
+                            attenuation * self.colour(scattered, depth + 1)
+                        }
                         None => Colour::black(),
                     }
                 } else {

@@ -18,7 +18,7 @@ pub trait Scatter {
     fn scatter(self, ray: &Ray, hit: &Hit) -> Option<(Colour, Ray)>;
 }
 
-impl Scatter {
+impl dyn Scatter {
     fn random_in_unit_sphere() -> V3 {
         let mut p = V3::new(100.0, 0.0, 0.0);
         while p.magnitude() >= 1.0 {
